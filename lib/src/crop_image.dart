@@ -1,6 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
-
+import 'package:rxdart/subjects.dart';
 import 'crop_controller.dart';
 import 'crop_grid.dart';
 import 'crop_rect.dart';
@@ -113,7 +113,7 @@ class CropImage extends StatefulWidget {
   final CustomPainter? overlayPainter;
 
   const CropImage({
-    Key? key,
+    super.key,
     this.controller,
     required this.image,
     this.gridColor = Colors.white70,
@@ -140,8 +140,7 @@ class CropImage extends StatefulWidget {
         assert(gridThickWidth > 0, 'gridThickWidth cannot be zero'),
         assert(minimumImageSize > 0, 'minimumImageSize cannot be zero'),
         assert(maximumImageSize >= minimumImageSize,
-            'maximumImageSize cannot be less than minimumImageSize'),
-        super(key: key);
+            'maximumImageSize cannot be less than minimumImageSize');
 
   @override
   State<CropImage> createState() => _CropImageState();
@@ -185,9 +184,10 @@ class _CropImageState extends State<CropImage> {
   late CropController controller;
   late ImageStream _stream;
   late ImageStreamListener _streamListener;
-  var currentCrop = Rect.zero;
+  BehaviorSubject<Rect> currentCrop = BehaviorSubject.seeded(Rect.zero);
   var size = Size.zero;
-  _TouchPoint? panStart;
+  BehaviorSubject<_TouchPoint?> panStart =
+      BehaviorSubject<_TouchPoint?>.seeded(null);
 
   Map<_CornerTypes, Offset> get gridCorners => <_CornerTypes, Offset>{
         _CornerTypes.UpperLeft: controller.crop.topLeft
@@ -210,7 +210,7 @@ class _CropImageState extends State<CropImage> {
 
     controller = widget.controller ?? CropController();
     controller.addListener(onChange);
-    currentCrop = controller.crop;
+    currentCrop.add(controller.crop);
 
     _stream = widget.image.image.resolve(const ImageConfiguration());
     _streamListener =
@@ -312,22 +312,30 @@ class _CropImageState extends State<CropImage> {
                     onPanStart: onPanStart,
                     onPanUpdate: onPanUpdate,
                     onPanEnd: onPanEnd,
-                    child: CropGrid(
-                      crop: currentCrop,
-                      gridColor: widget.gridColor,
-                      gridInnerColor: widget.gridInnerColor,
-                      gridCornerColor: widget.gridCornerColor,
-                      paddingSize: widget.paddingSize,
-                      cornerSize: showCorners ? widget.gridCornerSize : 0,
-                      thinWidth: widget.gridThinWidth,
-                      thickWidth: widget.gridThickWidth,
-                      scrimColor: widget.scrimColor,
-                      showCorners: showCorners,
-                      alwaysShowThirdLines: widget.alwaysShowThirdLines,
-                      isMoving: panStart != null,
-                      onSize: (size) {
-                        this.size = size;
-                      },
+                    child: StreamBuilder(
+                      stream: panStart.stream,
+                      builder: (_, panStart) => StreamBuilder(
+                          stream: currentCrop.stream,
+                          builder: (context, currentCrop) {
+                            return CropGrid(
+                              crop: currentCrop.data!,
+                              gridColor: widget.gridColor,
+                              gridInnerColor: widget.gridInnerColor,
+                              gridCornerColor: widget.gridCornerColor,
+                              paddingSize: widget.paddingSize,
+                              cornerSize:
+                                  showCorners ? widget.gridCornerSize : 0,
+                              thinWidth: widget.gridThinWidth,
+                              thickWidth: widget.gridThickWidth,
+                              scrimColor: widget.scrimColor,
+                              showCorners: showCorners,
+                              alwaysShowThirdLines: widget.alwaysShowThirdLines,
+                              isMoving: panStart.data != null,
+                              onSize: (size) {
+                                this.size = size;
+                              },
+                            );
+                          }),
                     ),
                   ),
                 ),
@@ -338,42 +346,36 @@ class _CropImageState extends State<CropImage> {
       );
 
   void onPanStart(DragStartDetails details) {
-    if (panStart == null) {
+    if (panStart.value == null) {
       final type = hitTest(details.localPosition);
       if (type != _CornerTypes.None) {
         var basePoint = gridCorners[
             (type == _CornerTypes.Move) ? _CornerTypes.UpperLeft : type]!;
-        setState(() {
-          panStart = _TouchPoint(type, details.localPosition - basePoint);
-        });
+        panStart.add(_TouchPoint(type, details.localPosition - basePoint));
       }
     }
   }
 
   void onPanUpdate(DragUpdateDetails details) {
-    if (panStart != null) {
+    if (panStart.value != null) {
       final offset = details.localPosition -
-          panStart!.offset -
+          panStart.value!.offset -
           Offset(widget.paddingSize, widget.paddingSize);
-      if (panStart!.type == _CornerTypes.Move) {
+      if (panStart.value!.type == _CornerTypes.Move) {
         moveArea(offset);
       } else {
-        moveCorner(panStart!.type, offset);
+        moveCorner(panStart.value!.type, offset);
       }
       widget.onCrop?.call(controller.crop);
     }
   }
 
   void onPanEnd(DragEndDetails details) {
-    setState(() {
-      panStart = null;
-    });
+    panStart.add(null);
   }
 
   void onChange() {
-    setState(() {
-      currentCrop = controller.crop;
-    });
+    currentCrop.add(controller.crop);
   }
 
   _CornerTypes hitTest(Offset point) {

@@ -20,7 +20,7 @@ class CropGrid extends StatelessWidget {
   final ValueChanged<Size> onSize;
 
   const CropGrid({
-    Key? key,
+    super.key,
     required this.crop,
     required this.gridColor,
     required this.gridInnerColor,
@@ -34,7 +34,7 @@ class CropGrid extends StatelessWidget {
     required this.alwaysShowThirdLines,
     required this.isMoving,
     required this.onSize,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) => RepaintBoundary(
