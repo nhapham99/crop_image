@@ -318,7 +318,7 @@ class _CropImageState extends State<CropImage> {
                           stream: currentCrop.stream,
                           builder: (context, currentCrop) {
                             return CropGrid(
-                              crop: currentCrop.data!,
+                              crop: currentCrop.data ?? controller.crop,
                               gridColor: widget.gridColor,
                               gridInnerColor: widget.gridInnerColor,
                               gridCornerColor: widget.gridCornerColor,
