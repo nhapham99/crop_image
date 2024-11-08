@@ -181,6 +181,7 @@ class CropImage extends StatefulWidget {
 enum _CornerTypes { UpperLeft, UpperRight, LowerRight, LowerLeft, None, Move }
 
 class _CropImageState extends State<CropImage> {
+  bool isInitialized = false;
   late CropController controller;
   late ImageStream _stream;
   late ImageStreamListener _streamListener;
@@ -234,7 +235,7 @@ class _CropImageState extends State<CropImage> {
   @override
   void didUpdateWidget(CropImage oldWidget) {
     super.didUpdateWidget(oldWidget);
-
+    isInitialized = false;
     if (widget.controller == null && oldWidget.controller != null) {
       controller = CropController.fromValue(oldWidget.controller!.value);
     } else if (widget.controller != null && oldWidget.controller == null) {
@@ -317,8 +318,12 @@ class _CropImageState extends State<CropImage> {
                       builder: (_, panStart) => StreamBuilder(
                           stream: currentCrop.stream,
                           builder: (context, currentCrop) {
+                            if (currentCrop.data == null) {
+                              return const SizedBox();
+                            }
+
                             return CropGrid(
-                              crop: currentCrop.data ?? controller.crop,
+                              crop: currentCrop.data!,
                               gridColor: widget.gridColor,
                               gridInnerColor: widget.gridInnerColor,
                               gridCornerColor: widget.gridCornerColor,
@@ -376,6 +381,10 @@ class _CropImageState extends State<CropImage> {
 
   void onChange() {
     currentCrop.add(controller.crop);
+    if (!isInitialized) {
+      isInitialized = true;
+      setState(() {});
+    }
   }
 
   _CornerTypes hitTest(Offset point) {
