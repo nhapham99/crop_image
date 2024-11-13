@@ -325,9 +325,8 @@ class _CropImageState extends State<CropImage> {
                               return const SizedBox();
                             }
 
-                            return Column(
-                              mainAxisSize: MainAxisSize.min,
-                              crossAxisAlignment: CrossAxisAlignment.center,
+                            return Stack(
+                              clipBehavior: Clip.none,
                               children: [
                                 CropGrid(
                                   crop: currentCrop.data!,
