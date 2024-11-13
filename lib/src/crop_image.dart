@@ -112,6 +112,8 @@ class CropImage extends StatefulWidget {
   /// Could be used for special effects on the cropped area.
   final CustomPainter? overlayPainter;
 
+  final Widget? cropDescription;
+
   const CropImage({
     super.key,
     this.controller,
@@ -132,6 +134,7 @@ class CropImage extends StatefulWidget {
     this.maximumImageSize = double.infinity,
     this.alwaysMove = false,
     this.overlayPainter,
+    this.cropDescription,
   })  : gridInnerColor = gridInnerColor ?? gridColor,
         gridCornerColor = gridCornerColor ?? gridColor,
         assert(gridCornerSize > 0, 'gridCornerSize cannot be zero'),
@@ -322,23 +325,32 @@ class _CropImageState extends State<CropImage> {
                               return const SizedBox();
                             }
 
-                            return CropGrid(
-                              crop: currentCrop.data!,
-                              gridColor: widget.gridColor,
-                              gridInnerColor: widget.gridInnerColor,
-                              gridCornerColor: widget.gridCornerColor,
-                              paddingSize: widget.paddingSize,
-                              cornerSize:
-                                  showCorners ? widget.gridCornerSize : 0,
-                              thinWidth: widget.gridThinWidth,
-                              thickWidth: widget.gridThickWidth,
-                              scrimColor: widget.scrimColor,
-                              showCorners: showCorners,
-                              alwaysShowThirdLines: widget.alwaysShowThirdLines,
-                              isMoving: panStart.data != null,
-                              onSize: (size) {
-                                this.size = size;
-                              },
+                            return Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                CropGrid(
+                                  crop: currentCrop.data!,
+                                  gridColor: widget.gridColor,
+                                  gridInnerColor: widget.gridInnerColor,
+                                  gridCornerColor: widget.gridCornerColor,
+                                  paddingSize: widget.paddingSize,
+                                  cornerSize:
+                                      showCorners ? widget.gridCornerSize : 0,
+                                  thinWidth: widget.gridThinWidth,
+                                  thickWidth: widget.gridThickWidth,
+                                  scrimColor: widget.scrimColor,
+                                  showCorners: showCorners,
+                                  alwaysShowThirdLines:
+                                      widget.alwaysShowThirdLines,
+                                  isMoving: panStart.data != null,
+                                  onSize: (size) {
+                                    this.size = size;
+                                  },
+                                ),
+                                if (widget.cropDescription != null)
+                                  widget.cropDescription!,
+                              ],
                             );
                           }),
                     ),
