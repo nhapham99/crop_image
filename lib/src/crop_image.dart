@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'dart:ui' as ui;
+import 'package:flutter/widgets.dart';
 import 'package:rxdart/subjects.dart';
 import 'crop_controller.dart';
 import 'crop_grid.dart';
@@ -292,6 +293,7 @@ class _CropImageState extends State<CropImage> {
                 widget.minimumImageSize != widget.maximumImageSize;
             return Stack(
               alignment: Alignment.center,
+              clipBehavior: Clip.none,
               children: <Widget>[
                 SizedBox(
                   width: width,
@@ -325,36 +327,29 @@ class _CropImageState extends State<CropImage> {
                               return const SizedBox();
                             }
 
-                            return Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                CropGrid(
-                                  crop: currentCrop.data!,
-                                  gridColor: widget.gridColor,
-                                  gridInnerColor: widget.gridInnerColor,
-                                  gridCornerColor: widget.gridCornerColor,
-                                  paddingSize: widget.paddingSize,
-                                  cornerSize:
-                                      showCorners ? widget.gridCornerSize : 0,
-                                  thinWidth: widget.gridThinWidth,
-                                  thickWidth: widget.gridThickWidth,
-                                  scrimColor: widget.scrimColor,
-                                  showCorners: showCorners,
-                                  alwaysShowThirdLines:
-                                      widget.alwaysShowThirdLines,
-                                  isMoving: panStart.data != null,
-                                  onSize: (size) {
-                                    this.size = size;
-                                  },
-                                ),
-                                if (widget.cropDescription != null)
-                                  widget.cropDescription!,
-                              ],
+                            return CropGrid(
+                              crop: currentCrop.data!,
+                              gridColor: widget.gridColor,
+                              gridInnerColor: widget.gridInnerColor,
+                              gridCornerColor: widget.gridCornerColor,
+                              paddingSize: widget.paddingSize,
+                              cornerSize:
+                                  showCorners ? widget.gridCornerSize : 0,
+                              thinWidth: widget.gridThinWidth,
+                              thickWidth: widget.gridThickWidth,
+                              scrimColor: widget.scrimColor,
+                              showCorners: showCorners,
+                              alwaysShowThirdLines: widget.alwaysShowThirdLines,
+                              isMoving: panStart.data != null,
+                              onSize: (size) {
+                                this.size = size;
+                              },
                             );
                           }),
                     ),
                   ),
                 ),
+                if (widget.cropDescription != null) widget.cropDescription!,
               ],
             );
           },
