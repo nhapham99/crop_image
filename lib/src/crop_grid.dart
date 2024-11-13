@@ -41,6 +41,7 @@ class CropGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Stack(
         clipBehavior: Clip.none,
+        alignment: Alignment.center,
         children: [
           Positioned.fill(
             child: RepaintBoundary(
