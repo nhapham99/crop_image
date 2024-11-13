@@ -50,7 +50,8 @@ class CropGrid extends StatelessWidget {
           ),
           if (cropDescription != null)
             Positioned(
-              bottom: 0,
+              left: crop.left,
+              top: crop.top,
               child: cropDescription!,
             ),
         ],
