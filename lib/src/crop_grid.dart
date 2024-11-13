@@ -18,7 +18,6 @@ class CropGrid extends StatelessWidget {
   final bool alwaysShowThirdLines;
   final bool isMoving;
   final ValueChanged<Size> onSize;
-  final Widget? cropDescription;
 
   const CropGrid({
     super.key,
@@ -35,17 +34,16 @@ class CropGrid extends StatelessWidget {
     required this.alwaysShowThirdLines,
     required this.isMoving,
     required this.onSize,
-    this.cropDescription,
   });
 
   @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
+  Widget build(BuildContext context) => Stack(
         children: [
-          RepaintBoundary(
-            child: CustomPaint(foregroundPainter: _CropGridPainter(this)),
+          Positioned.fill(
+            child: RepaintBoundary(
+              child: CustomPaint(foregroundPainter: _CropGridPainter(this)),
+            ),
           ),
-          if (cropDescription != null) cropDescription!,
         ],
       );
 }

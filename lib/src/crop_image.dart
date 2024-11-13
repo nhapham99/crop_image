@@ -321,32 +321,31 @@ class _CropImageState extends State<CropImage> {
                     child: StreamBuilder(
                       stream: panStart.stream,
                       builder: (_, panStart) => StreamBuilder(
-                          stream: currentCrop.stream,
-                          builder: (context, currentCrop) {
-                            if (currentCrop.data == null) {
-                              return const SizedBox();
-                            }
+                        stream: currentCrop.stream,
+                        builder: (context, currentCrop) {
+                          if (currentCrop.data == null) {
+                            return const SizedBox();
+                          }
 
-                            return CropGrid(
-                              crop: currentCrop.data!,
-                              gridColor: widget.gridColor,
-                              gridInnerColor: widget.gridInnerColor,
-                              gridCornerColor: widget.gridCornerColor,
-                              paddingSize: widget.paddingSize,
-                              cornerSize:
-                                  showCorners ? widget.gridCornerSize : 0,
-                              thinWidth: widget.gridThinWidth,
-                              thickWidth: widget.gridThickWidth,
-                              scrimColor: widget.scrimColor,
-                              showCorners: showCorners,
-                              alwaysShowThirdLines: widget.alwaysShowThirdLines,
-                              isMoving: panStart.data != null,
-                              cropDescription: widget.cropDescription,
-                              onSize: (size) {
-                                this.size = size;
-                              },
-                            );
-                          }),
+                          return CropGrid(
+                            crop: currentCrop.data!,
+                            gridColor: widget.gridColor,
+                            gridInnerColor: widget.gridInnerColor,
+                            gridCornerColor: widget.gridCornerColor,
+                            paddingSize: widget.paddingSize,
+                            cornerSize: showCorners ? widget.gridCornerSize : 0,
+                            thinWidth: widget.gridThinWidth,
+                            thickWidth: widget.gridThickWidth,
+                            scrimColor: widget.scrimColor,
+                            showCorners: showCorners,
+                            alwaysShowThirdLines: widget.alwaysShowThirdLines,
+                            isMoving: panStart.data != null,
+                            onSize: (size) {
+                              this.size = size;
+                            },
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),
