@@ -341,6 +341,7 @@ class _CropImageState extends State<CropImage> {
                               showCorners: showCorners,
                               alwaysShowThirdLines: widget.alwaysShowThirdLines,
                               isMoving: panStart.data != null,
+                              cropDescription: widget.cropDescription,
                               onSize: (size) {
                                 this.size = size;
                               },
@@ -349,7 +350,6 @@ class _CropImageState extends State<CropImage> {
                     ),
                   ),
                 ),
-                if (widget.cropDescription != null) widget.cropDescription!,
               ],
             );
           },
